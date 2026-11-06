@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord & Guitar Tuning Hub Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header Section -->
+    <header class="app-header">
+      <h1>🎵 Chord & Guitar Tuning Hub Pro</h1>
+      <p>Aplikasi Panduan Tuner Audio, Mic Detector, Metronom & Kalkulator Capo</p>
+    </header>
+
+    <!-- Real-time Mic Pitch Detector Card (FITUR BARU) -->
+    <section class="card mic-card">
+      <div class="card-header">
+        <h2>🎙️ Tuner Mikrofon Real-Time (Deteksi Gitar Asli)</h2>
+        <span id="mic-status" class="status-badge">Mikrofon Nonaktif</span>
+      </div>
+      <div class="mic-tuner-body">
+        <button id="mic-toggle-btn" class="auto-play-btn" onclick="toggleMicTuner()">Mulai Tuner Mic</button>
+        <div class="pitch-display">
+          <div class="pitch-note" id="detected-note">--</div>
+          <div class="pitch-freq" id="detected-freq">0.00 Hz</div>
+          <div class="pitch-feedback" id="pitch-feedback">Tekan 'Mulai Tuner Mic' & petik gitar Anda</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tuner Reference Generator Module Card -->
+    <section class="card">
+      <div class="card-header">
+        <h2>🎸 Panduan Frekuensi Stem Gitar (Generator)</h2>
+        <span id="status-indicator" class="status-badge">Siap Digunakan</span>
+      </div>
+      
+      <!-- Audio Visualizer Canvas -->
+      <div class="visualizer-container">
+        <canvas id="visualizer-canvas"></canvas>
+      </div>
+
+      <!-- Controls & Tuning Preset Dropdown (FITUR BARU: Preset Dropdown) -->
+      <div class="audio-controls">
+        <div class="control-group">
+          <label for="tuning-preset">Preset Tuning:</label>
+          <select id="tuning-preset" onchange="changeTuningPreset(this.value)">
+            <option value="standard">Standard E (E A D G B E)</option>
+            <option value="dropD">Drop D (D A D G B E)</option>
+            <option value="halfStep">Half-Step Down / Eb (D# G# C# F# A# D#)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="wave-select">Tipe Suara:</label>
+          <select id="wave-select">
+            <option value="sine">Sine (Halus / Akustik)</option>
+            <option value="triangle" selected>Triangle (Gitar Klasik)</option>
+            <option value="square">Square (Elektrik/Synth)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="volume-control">Volume:</label>
+          <input type="range" id="volume-control" min="0" max="1" step="0.1" value="0.5">
+        </div>
+        <button class="auto-play-btn" onclick="playAllStrings()">▶ Stem Otomatis (6 Senar)</button>
+      </div>
+
+      <!-- String Grid -->
+      <div class="tuner-grid" id="tuner-grid">
+        <!-- Generasi Tombol Senar via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Metronome Module Card -->
+    <section class="card">
+      <div class="card-header">
+        <h2>⏱️ Metronom Latihan Tempo</h2>
+        <span id="bpm-display" class="bpm-badge">120 BPM</span>
+      </div>
+      <div class="metronome-controls">
+        <div class="slider-group">
+          <label for="bpm-slider">Tempo (BPM):</label>
+          <input type="range" id="bpm-slider" min="40" max="220" value="120" oninput="updateBPM(this.value)">
+        </div>
+        <button id="metronome-toggle-btn" class="metronome-btn" onclick="toggleMetronome()">Start Metronome</button>
+      </div>
+    </section>
+
+    <!-- Capo Calculator Card (FITUR BARU) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>📌 Capo & Transpose Calculator</h2>
+      </div>
+      <div class="capo-controls">
+        <div class="control-group">
+          <label for="capo-chord">Kunci Dasar:</label>
+          <select id="capo-chord">
+            <option value="C">C Major</option>
+            <option value="D">D Major</option>
+            <option value="E">E Major</option>
+            <option value="F">F Major</option>
+            <option value="G">G Major</option>
+            <option value="A">A Major</option>
+            <option value="Am">A Minor</option>
+            <option value="Em">E Minor</option>
+            <option value="Dm">D Minor</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="capo-fret">Posisi Capo (Fret):</label>
+          <input type="number" id="capo-fret" min="1" max="12" value="2">
+        </div>
+        <button class="auto-play-btn" onclick="calculateCapo()">Hitung Chord Hasil</button>
+      </div>
+      <div class="capo-result" id="capo-result">
+        Hitung perpindahan nada chord saat memakai Capo!
+      </div>
+    </section>
+
+    <!-- Chord Catalog Card -->
+    <section class="card">
+      <div class="card-header">
+        <h2>🔍 Cari Chord & Kunci Gitar</h2>
+      </div>
+      
+      <!-- Search Box & Favorite Filter -->
+      <div class="search-container">
+        <input type="text" id="chord-search" onkeyup="filterChords()" placeholder="Ketik nama chord atau genre (misal: C Major, Pop, Rock)...">
+        <button class="fav-filter-btn" onclick="toggleFavFilter(this)">★ Favorit Saja</button>
+      </div>
+
+      <!-- Chord List Container -->
+      <div class="chord-list" id="chord-list">
+        
+        <div class="chord-item" data-name="c major c pop acoustic ballad">
+          <div class="chord-info">
+            <h3>Kunci C Major (C) <span class="star-icon" onclick="toggleFavorite(this)">★</span></h3>
+            <p><strong>Struktur Nada:</strong> C - E - G</p>
+            <p><strong>Karakter Suara:</strong> Cerah, Netral, Stabil</p>
+            <button class="play-chord-btn" onclick="playChordAudio([261.63, 329.63, 392.00])">🔊 Dengar Chord</button>
+          </div>
+          <div class="fret-box">
+            <span class="fret-label">POSISI FRET</span>
+            <span class="fret-code">x 3 2 0 1 0</span>
+          </div>
+        </div>
+
+        <div class="chord-item" data-name="g major g pop country rock">
+          <div class="chord-info">
+            <h3>Kunci G Major (G) <span class="star-icon" onclick="toggleFavorite(this)">★</span></h3>
+            <p><strong>Struktur Nada:</strong> G - B - D</p>
+            <p><strong>Karakter Suara:</strong> Hangat, Megah, Terang</p>
+            <button class="play-chord-btn" onclick="playChordAudio([196.00, 246.94, 293.66, 392.00])">🔊 Dengar Chord</button>
+          </div>
+          <div class="fret-box">
+            <span class="fret-label">POSISI FRET</span>
+            <span class="fret-code">3 2 0 0 0 3</span>
+          </div>
+        </div>
+
+        <div class="chord-item" data-name="a minor am slow pop ballad acoustic">
+          <div class="chord-info">
+            <h3>Kunci A Minor (Am) <span class="star-icon" onclick="toggleFavorite(this)">★</span></h3>
+            <p><strong>Struktur Nada:</strong> A - C - E</p>
+            <p><strong>Karakter Suara:</strong> Emosional, Sedih, Melankolis</p>
+            <button class="play-chord-btn" onclick="playChordAudio([220.00, 261.63, 329.63])">🔊 Dengar Chord</button>
+          </div>
+          <div class="fret-box">
+            <span class="fret-label">POSISI FRET</span>
+            <span class="fret-code">x 0 2 2 1 0</span>
+          </div>
+        </div>
+
+        <div class="chord-item" data-name="e minor em rock metal ballad">
+          <div class="chord-info">
+            <h3>Kunci E Minor (Em) <span class="star-icon" onclick="toggleFavorite(this)">★</span></h3>
+            <p><strong>Struktur Nada:</strong> E - G - B</p>
+            <p><strong>Karakter Suara:</strong> Dalam, Gelap, Serius</p>
+            <button class="play-chord-btn" onclick="playChordAudio([164.81, 196.00, 246.94])">🔊 Dengar Chord</button>
+          </div>
+          <div class="fret-box">
+            <span class="fret-label">POSISI FRET</span>
+            <span class="fret-code">0 2 2 0 0 0</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
